@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="stylesheet" href="/static/index.css"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="/static/index.js"></script>
+        <title>PosT +</title>
+    </head>
+
+    <body>
+
+      <header id="cabecera">
+        <div align="right">
+          {% if usuario_ha_iniciado_sesion %}
+            <form action="/cerrar_sesion" id="frCerrarSesion" method="POST" enctype="multipart/form-data">
+              <button type="submit" name="logout_button" id="logout_button" class="btn btn-warning">Cerrar Sesión</button>
+            </form>
+          {% else %}
+            <a data-target="#login" role="button" class="btn btn-warning" data-toggle="modal"><span></span>Iniciar Sesión</a>
+            <a data-target="#register" role="button" class="btn btn-warning" data-toggle="modal"><span></span>Registrarse</a>
+          {% endif %}
+        </div> 
+      </header>
+
+      <section>
+        <div id="dvMensages">
+            {% if lista_publicaciones %}
+              {% for publicacion in lista_publicaciones %}
+                <article>
+                  <h1>{{ publicacion.usuario }}</h1>
+                  {% if publicacion.texto %}
+                    <p> {{ publicacion.texto }}</p>
+                  {% endif %}
+                  {% if publicacion.imagen %}
+                    <img src="data:image/png;base64, {{ publicacion.imagen }}" style="max-width: 100%; min-width: 100%;">
+                  {% endif %}
+                  <hr>
+                  <div>
+                    <div id="comments" class="modal fade">  
+                      <div id= "modal-dialog-login" class="modal-dialog">  
+                        <div class="modal-content">  
+                          <div class="modal-header">  
+                            <button type="button" class="close" data-dismiss="modal">×</button>  
+                            <h4 class="modal-title">Comentarios</h4>  
+                          </div>  
+                          <div class="modal-body">
+                            {% if usuario_ha_iniciado_sesion %}
+                              <form action="/postComment" id="frComentar" method="POST" enctype="multipart/form-data">
+                                <div class="input-group">
+                                  <input type="text" name="comment"  Id="comment" class="form-control"/>
+                                  <input name="emailPostComment" id="emailPostComment" style="display: none;" value="{{ publicacion.email }}"></input>
+                                  <input name="idPostComment" id="idPostComment" style="display: none;" value="{{ publicacion.id }}"></input>
+                                  <span class="input-group-btn">
+                                    <button type="submit" name="post_button" id="post_button" class="btn btn-default">Comentar</button>
+                                  </span>
+                                </div>
+                                <div id="comment_warnings">
+                                  <p class="warnings" id="comment_warnings_p">
+                                      {% with error_messages = get_flashed_messages(True, "comment_warnings") %}
+                                          {% if error_messages %}
+                                              {% for message in error_messages %}
+                                                  {{ message[1] }}
+                                              {% endfor %}
+                                          {% endif %}
+                                      {% endwith %}
+                                  </p>
+                                </div>
+                              </form>
+                            {% endif %}
+                            {% if publicacion.comentarios %}
+                              {% for comentario in publicacion.comentarios %}
+                                <p id="{{publicacion.email}} {{publicacion.id}}"> {{ comentario }}</p>
+                              {% endfor %}
+                            {% else %}
+                              <p>Aún no hay comentarios</p>
+                            {% endif %}
+                          </div>  
+                        </div>  
+                      </div>  
+                    </div>  
+
+                    </div>
+                      {% if usuario_ha_iniciado_sesion %}
+                        <form action="/addPoint" id="frSumarPunto" method="POST" enctype="multipart/form-data">
+                          <button type="submit" class="btn btn-warning" name="addPoint" id="addPoint">+</button>
+                          <input name="emailAdd" id="emailAdd" style="display: none;" value="{{ publicacion.email }}"></input>
+                          <input name="idAdd" id="idAdd" style="display: none;" value="{{ publicacion.id }}"></input>
+                        </form>
+                        <button class="btn btn-warning" id="points"> {{ publicacion.puntuacion }}</button>
+                        <form action="/substractPoint" id="frSumarPunto" method="POST" enctype="multipart/form-data">
+                          <button type="submit" class="btn btn-warning" name="substractPoint" id="substractPoint">-</button>
+                          <input name="emailSubstract" id="emailSubstract" style="display: none;" value="{{ publicacion.email }}"></input>
+                          <input name="idSubstract" id="idSubstract" style="display: none;" value="{{ publicacion.id }}"></input>
+                        </form>
+                      {% endif %}  
+                      <a data-target="#comments" style="float:right;" id="commentLoaderButton" role="button" class="btn btn-warning" data-email="{{ publicacion.email }}" data-id="{{ publicacion.id }}" data-toggle="modal"><span></span>Comentarios</a>
+                    <div>
+                  </div>
+                </article>
+              {% endfor %}
+            {% else %}
+              <h1>Todavía no hay publicaciones</h1>
+            {% endif %}
+        </div>
+      </section>
+
+      <footer>
+          {% if usuario_ha_iniciado_sesion %}
+            <a data-target="#config" role="button" class="btn btn-warning" data-toggle="modal"><span></span>Configuración</a>
+            <a data-target="#newPost" role="button" class="btn btn-warning" data-toggle="modal"><span></span>Nueva publicación</a>
+            <a data-target="#profile" role="button" class="btn btn-warning" data-toggle="modal"><span></span>Perfil</a>
+          {% endif %}
+      </footer>
+
+      <div id="login" class="modal fade">  
+        <div id= "modal-dialog-login" class="modal-dialog">  
+          <div class="modal-content">  
+            <div class="modal-header">  
+              <button type="button" class="close" data-dismiss="modal">×</button>  
+              <h4 class="modal-title">Bienvenido</h4>  
+            </div>  
+            <div class="modal-body">
+              <form action="/iniciar_sesion" onsubmit="return validateLogin()" id="frIniciarSesion" method="POST" enctype="multipart/form-data">
+                <label for="email">Correo electrónico</label>  
+                <input type="text" name="email" id="email" class="form-control" />
+                <div id="login_email_warnings">
+                  <p class="warnings" id="login_email_warnings_p">
+                      {% with error_messages = get_flashed_messages(True, "login_email_warning") %}
+                          {% if error_messages %}
+                              {% for message in error_messages %}
+                                  {{ message[1] }}
+                              {% endfor %}
+                          {% endif %}
+                      {% endwith %}
+                  </p>
+                </div>
+                <br />  
+                <label>Contraseña</label>  
+                <input type="password" name="password" id="password" class="form-control" />
+                <div id="login_password_warnings">
+                  <p class="warnings" id="login_password_warnings_p">
+                      {% with error_messages = get_flashed_messages(True, "login_password_warning") %}
+                          {% if error_messages %}
+                              {% for message in error_messages %}
+                                  {{ message[1] }}
+                              {% endfor %}
+                          {% endif %}
+                      {% endwith %}
+                  </p>
+                </div>
+                <br />  
+                <button type="submit" name="login_button" id="login_button" class="btn btn-warning">Login</button>
+              </form>
+            </div>  
+          </div>  
+        </div>  
+      </div>  
+
+      <div id="register" class="modal fade">  
+        <div id= "modal-dialog-register" class="modal-dialog">  
+          <div class="modal-content">  
+            <div class="modal-header">  
+              <button type="button" class="close" data-dismiss="modal">×</button>  
+              <h4 class="modal-title">Bienvenido</h4>  
+            </div>  
+            <div class="modal-body"> 
+              <form action="/registrarse" onsubmit="return validateRegister()" id="frRegistrarse" method="POST" enctype="multipart/form-data">
+                <label for="username">Usuario</label>  
+                <input type="text" name="username" id="username" class="form-control" />
+                <div id="register_username_warnings">
+                  <p class="warnings" id="register_username_warnings_p">
+                      {% with error_messages = get_flashed_messages(True, "register_username_warning") %}
+                          {% if error_messages %}
+                              {% for message in error_messages %}
+                                  {{ message[1] }}
+                              {% endfor %}
+                          {% endif %}
+                      {% endwith %}
+                  </p>
+                </div>
+                <br />  
+                <label for="email">Correo electrónico</label>  
+                <input type="text" name="email" id="email" class="form-control" />  
+                <div id="register_email_warnings">
+                  <p class="warnings" id="register_email_warning_p">
+                      {% with error_messages = get_flashed_messages(True, "register_email_warning") %}
+                          {% if error_messages %}
+                              {% for message in error_messages %}
+                                  {{ message[1] }}
+                              {% endfor %}
+                          {% endif %}
+                      {% endwith %}
+                  </p>
+                </div>
+                <br />  
+                <label for="password">Contraseña</label>  
+                <input type="password" name="password" id="password" class="form-control" />
+                <div id="register_password_warnings">
+                  <p class="warnings" id="register_password_warnings_p">
+                      {% with error_messages = get_flashed_messages(True, "register_password_warning") %}
+                          {% if error_messages %}
+                              {% for message in error_messages %}
+                                  {{ message[1] }}
+                              {% endfor %}
+                          {% endif %}
+                      {% endwith %}
+                  </p>
+                </div>
+                <br />  
+                <button type="submit" name="register_button" id="register_button" class="btn btn-warning">Registrarse</button>  
+              </form>
+            </div>  
+          </div>  
+        </div>  
+      </div>
+
+      <div id="newPost" class="modal fade">  
+        <div id= "modal-dialog-newPost" class="modal-dialog">  
+          <div class="modal-content">  
+            <div class="modal-header">  
+              <button type="button" class="close" data-dismiss="modal">×</button>  
+              <h4 class="modal-title">Nueva Publicacion</h4>  
+            </div>  
+            <div class="modal-body"> 
+              <form action="/publicar" onsubmit="return validateNewPost()" id="frPublicar" method="POST" enctype="multipart/form-data">
+                <label for="edMensaje"></label>
+                <textarea type="text" spellcheck rows="5" cols="80" id="edMensaje" name="edMensaje" class="form-control"></textarea>
+                <br/>
+                <label for="edImagen"></label>
+                <input type="file" id="edImagen" name="edImagen" class="form-control">
+                <div id="post_warnings">
+                  <p class="warnings" id="post_warnings_p">
+                    {% with error_messages = get_flashed_messages(True, "post_warnings") %}
+                      {% if error_messages %}
+                        {% for message in error_messages %}
+                          {{ message[1] }}
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+                  </p>
+                </div>
+                <br/>
+                <button type="submit" name="post_button" id="post_button" class="btn btn-warning">Publicar</button>
+              </form> 
+            </div>  
+          </div>  
+        </div>
+      </div>
+
+      <div id="profile" class="modal fade">  
+        <div id= "modal-dialog-profile" class="modal-dialog">  
+          <div class="modal-content">  
+            <div class="modal-header">  
+              <button type="button" class="close" data-dismiss="modal">×</button>  
+              <h4 class="modal-title">Perfil</h4>  
+            </div>  
+            <div class="modal-body"> 
+              <div id="dvMensages">
+                {% if lista_publicaciones_current_usr %}
+                  {% for publicacion in lista_publicaciones_current_usr %}
+                    <article>
+                      <h1>{{ publicacion.usuario }}</h1>
+                      {% if publicacion.texto %}
+                        <p> {{ publicacion.texto }}</p>
+                      {% endif %}
+                      {% if publicacion.imagen %}
+                        <img src="data:image/png;base64, {{ publicacion.imagen }}">
+                      {% endif %}
+                      </article>
+                  {% endfor %}
+                {% else %}
+                    Todavía no hay mensajes
+                {% endif %}
+              </div>    
+            </div>  
+          </div>  
+        </div>
+      </div>
+
+      <div id="config" class="modal fade">  
+        <div id= "modal-dialog-config" class="modal-dialog">  
+          <div class="modal-content">  
+            <div class="modal-header">  
+              <button type="button" class="close" data-dismiss="modal">×</button>  
+              <h4 class="modal-title">Configuración</h4>  
+            </div>  
+            <div class="modal-body">
+              <a data-target="#delete_account" role="button" class="btn btn-warning" data-toggle="modal"><span></span>Borrar cuenta</a> 
+              <br />
+              <br />
+              <a data-target="#change_password" role="button" class="btn btn-warning" data-toggle="modal"><span></span>Cambiar contraseña</a> 
+            </div>  
+          </div>  
+        </div>
+      </div>
+
+      <div id="delete_account" class="modal fade">  
+        <div id="modal-dialog-delete_account" class="modal-dialog">  
+          <div class="modal-content">  
+            <div class="modal-header">  
+              <button type="button" class="close" data-dismiss="modal">×</button>  
+              <h4 class="modal-title">Borrar cuenta</h4>  
+            </div>  
+            <div class="modal-body">
+              <form action="/borrar_cuenta" id="frBorrarCuenta" method="POST" enctype="multipart/form-data"> 
+                <label>Introduce tu contraseña</label>  
+                <input type="password" name="password" id="password" class="form-control" />
+                <div id="delete_account_password_warnings">
+                  <p class="warnings">
+                      {% with error_messages = get_flashed_messages(True, "delete_account_password_warnings") %}
+                        {% if error_messages %}
+                            {% for message in error_messages %}
+                              {{ message[1] }}
+                            {% endfor %}
+                        {% endif %}
+                      {% endwith %}
+                  </p>
+                </div>
+                <br />  
+                <button type="submit" name="delete_account_button" id="delete_account_button" class="btn btn-warning">Borrar</button>
+              </form>
+            </div>  
+          </div>  
+        </div>
+      </div>
+
+      <div id="change_password" class="modal fade">  
+        <div id="modal-dialog-change_password" class="modal-dialog">  
+          <div class="modal-content">  
+            <div class="modal-header">  
+              <button type="button" class="close" data-dismiss="modal">×</button>  
+              <h4 class="modal-title">Cambiar contraseña</h4>  
+            </div>  
+            <div class="modal-body">
+              <form action="/cambiar_contrasenha" onsubmit="return validateNewPassword()" id="frCambiarContrasenha" method="POST" enctype="multipart/form-data"> 
+                <label>Introduce tu contraseña</label>  
+                <input type="password" name="password" id="password" class="form-control" />
+                <div id="change_password_warnings">
+                  <p class="warnings">
+                      {% with error_messages = get_flashed_messages(True, "change_password_warnings") %}
+                        {% if error_messages %}
+                            {% for message in error_messages %}
+                              {{ message[1] }}
+                            {% endfor %}
+                        {% endif %}
+                      {% endwith %}
+                  </p>
+                </div>
+                <br />
+                <label>Introduce la nueva contraseña</label>  
+                <input type="password" name="new_password" id="new_password" class="form-control" />
+                <div id="change_new_password_warnings">
+                  <p class="warnings" id="change_new_password_warnings_p">
+                      {% with error_messages = get_flashed_messages(True, "change_new_password_warnings") %}
+                        {% if error_messages %}
+                            {% for message in error_messages %}
+                              {{ message[1] }}
+                            {% endfor %}
+                        {% endif %}
+                      {% endwith %}
+                  </p>
+                </div>
+                <br />  
+                <button type="submit" name="delete_account_button" id="delete_account_button" class="btn btn-warning">Cambiar</button>
+              </form>
+            </div>  
+          </div>  
+        </div>
+      </div>
+
+    </body>
+</html>

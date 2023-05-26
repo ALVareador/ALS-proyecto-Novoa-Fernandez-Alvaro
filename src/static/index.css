@@ -1,0 +1,120 @@
+body{
+  background-color: #FFF8F0;
+  color: #392F5A;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Style the header */
+header {
+  position:fixed;
+  background-color: #9DD9D2;
+  padding: 20px;
+  width: 100%;
+  text-align: right;
+}
+
+article {
+  margin-bottom: 10px;
+  padding: 20px;
+  width: 100%;
+  text-align: left;
+  background-color: #FFF8F0;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #F4D06F;
+  border-radius: 5px;
+}
+
+section {
+  padding: 10px;
+  padding-top: 80px;
+  padding-bottom: 60px;
+  height: 100%;
+  width: 100%;
+  text-align: center;
+  background-color: #FFF8F0;
+
+  #dvMensages{
+    width: 70%;
+    max-width: 800px; 
+    margin: 0 auto;
+  }
+}
+
+/* Style the footer */
+footer {
+  width: 60%;
+  background-color: #9DD9D2;
+  padding: 10px;
+  text-align: center;
+  color: white;
+  position: fixed;
+  left: 20%;
+  bottom: 0;
+  min-height: 55px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+img {
+  border-radius: 5px;
+  max-width: 100%; 
+  min-width: 100%;
+}
+
+input, textarea {
+  color:#392F5A!important;
+  background-color:#fffcf9!important;
+  border-color: #F4D06F!important;
+  resize: none;
+}
+
+.warnings {
+  color: #b11010;
+  margin: 10px; 
+}
+
+.btn {
+  background-color: #F4D06F;
+  border-color: #F4D06F;
+  color: #392F5A;
+}
+.btn:hover {
+  background-color: #FF8811;
+  border-color: #FF8811;
+}
+
+.modal-content {
+  background-color: #FFF8F0;
+  border-color: #FFF8F0;
+  align-items: center;
+  color:#392F5A;
+}
+
+.modal-dialog{
+  margin-top: 100px;
+}
+
+#modal-dialog-login, #modal-dialog-register {
+  margin-right: 15px;
+  width: 300px;
+}
+
+#modal-dialog-profile {
+  margin-top: 80px;
+  margin-bottom: 80px;
+  width: 800px;
+}
+
+#modal-dialog-change_password, #modal-dialog-delete_account {
+  margin-top: 90px;
+  width: 650px;
+}
+
+form {
+  display: inline-block;
+}
+
+hr {
+  border-color: #F4D06F;
+}

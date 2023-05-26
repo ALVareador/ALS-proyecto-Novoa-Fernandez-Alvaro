@@ -1,0 +1,5 @@
+Apellidos, nombre: Nóvoa Fernández, Álvaro
+NIF: 45147345R
+email: alvaro.novoa.2001@gmail.com
+Proyecto: App en la que los usuarios guardan un texto o imagen, el resto puede comentar y puntuar.
+Repositorio: https://github.com/ALVareador/ALS-proyecto-Novoa-Fernandez-Alvaro.git
